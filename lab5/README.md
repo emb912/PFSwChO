@@ -17,14 +17,14 @@ NAME      READY   UP-TO-DATE   AVAILABLE   AGE
 no-test   0/1     0            0           57m
 ```
 Jak widać w sekcji READY jest 0/1. Ten status się utrzymuje przez cały czas od uruchomienia.
-Następnie sprawdziłam, czy doszło do próby utworzenia poda:
+Następnie sprawdziłam, czy doszło do próby utworzenia Poda:
 ```
 emilia@wojcik:~/lab5_zad$ kubectl get rs -n ns-dev
 NAME                   DESIRED   CURRENT   READY   AGE
 no-test-5d7d88bdbb     1         0         0       58m
 ```
 Jak widać, pod nie został uruchomiony (CURRENT 0, READY 0).
-Sprawdziłam szczegóły poda:
+Sprawdziłam szczegóły Poda:
 ```
 emilia@wojcik:~/lab5_zad$ kubectl describe rs no-test-5d7d88bdbb -n ns-dev
 (usuwam faragment dla czytelności)
@@ -52,14 +52,14 @@ NAME       READY   UP-TO-DATE   AVAILABLE   AGE
 yes-test   1/1     1            1           56m
 ```
 W sekcji READY mamy 1/1, czyli obiekt został utworzony poprawnie.
-Sprawdzam, czy został utworzony pod:
+Sprawdzam, czy został utworzony Pod:
 ```
 emilia@wojcik:~/lab5_zad$ kubectl get pods -n ns-dev
 NAME                         READY   STATUS    RESTARTS   AGE
 yes-test-6fd7dd7c5b-2tnbg    1/1     Running   0          63m
 ```
-Jest READY 1/1 i status RUNNING, czyli tak, jak powinno byc. 
-Szczegóły poda:
+Jest READY 1/1 i status RUNNING, czyli tak, jak powinno być. 
+Szczegóły Poda:
 ```
 emilia@wojcik:~/lab5_zad$ kubectl describe pod yes-test-6fd7dd7c5b-2tnbg -n ns-dev
 Name:             yes-test-6fd7dd7c5b-2tnbg
@@ -75,7 +75,7 @@ Status:           Running
 (usuwam faragment dla czytelności)
 Events:                      <none>
 ```
-Wartości zasobów (requests i limits) mieszczą się w zakresie określonym przez LimitRange i ResourceQuota, dlatego pod został uruchomiony poprawnie.
+Wartości zasobów (requests i limits) określone w manifeście mieszczą się w zakresie określonym przez LimitRange i ResourceQuota, dlatego pod został uruchomiony poprawnie.
 
 ## zero-test
 W celu utworzenia obiektu Deployment `zero-test` należy wykonać polecenie:
@@ -91,7 +91,7 @@ zero-test   1/1     1            1           63m
 ```
 W sekcji READY mamy 1/1, czyli obiekt został utworzony poprawnie.
 
-Sprawdzam status utworzonego poda:
+Sprawdzam status utworzonego Poda:
 ```
 emilia@wojcik:~/lab5_zad$ kubectl get pods -n ns-dev
 NAME                         READY   STATUS    RESTARTS   AGE
@@ -134,4 +134,4 @@ Containers:
 (usuwam fragment dla czytelnosci)
 Events:                      <none>
 ```
-Jak widac limity zostały utworzone poprawnie na podstawie przyjętych założeń, `Limits: cpu=200m, memory=256Mi; defaultRequest: cpu=100m, memory: 128Mi` (tak jak w dev-limit).
+Jak widać, limity zostały ustalone poprawnie na podstawie przyjętych założeń, `Limits: cpu=200m, memory=256Mi; defaultRequest: cpu=100m, memory: 128Mi` (tak jak w dev-limit).
