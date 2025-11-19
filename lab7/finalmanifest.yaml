@@ -1,0 +1,73 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: remote
+spec: {}
+status: {}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: remoteweb
+  name: remoteweb
+  namespace: remote
+spec:
+  containers:
+  - image: nginx
+    name: remoteweb
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2025-11-19T18:58:25Z"
+  labels:
+    run: remoteweb
+  name: remoteweb
+  namespace: remote
+  resourceVersion: "54700"
+  uid: 8cb7f95d-db55-4422-94fe-0df70d84bcc9
+spec:
+  clusterIP: 10.101.114.37
+  clusterIPs:
+  - 10.101.114.37
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - nodePort: 31999
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    run: remoteweb
+  sessionAffinity: None
+  type: NodePort
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: testpod
+  name: testpod
+spec:
+  containers:
+  - args:
+    - sleep
+    - infinity
+    image: busybox
+    name: testpod
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
