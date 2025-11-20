@@ -1,5 +1,23 @@
 # Utworzenie wymaganych zasobów
-W celu utworzenia przestrzeni nazw remote, Pod-a remotweb oraz obiektu Service, umożliwiającego dostęp do Pod-a, należy wykonać polecenie:
+Pliki yaml umożliwiające stworzenie poszczególnych zasobów zostały wygenerowane za pomocą odpowiednich poleceń:
+### 1. przestrzeń nazw remote
+```
+kubectl create ns remote --dry-run=client -o yaml > ns.yaml
+```
+### 2. Pod w przestrzeni nazw remote na bazie obrazu Nginx i obiekt Service, który umożliwia dostęp do Pod-a na porcie węzła minikube 31999
+```
+kubectl run remoteweb --image=nginx -n remote --dry-run=client -o yaml > remoteweb.yaml
+kubectl expose pod remoteweb --port=80 --type=NodePort -n remote --dry-run=client -o yaml > remoteweb-svc.yaml
+kubectl edit svc remoteweb -n remote
+```
+### 3. Pod w domyślnej przestrzeni nazw na bazie obrazu Busybox
+```
+kubectl run testpod --image=busybox --dry-run=client -o yaml -- sleep infinity > testpod.yaml
+```
+Następnie pliki yaml zostały połączone do jednego zbiorczego manifestu `finalmanifest.yaml`.
+
+### utworzenie zasobów na podstawie pliku yaml
+W celu utworzenia na bazie pliku yaml przestrzeni nazw remote, Pod-a remotweb oraz obiektu Service, umożliwiającego dostęp do Pod-a, należy wykonać polecenie:
 ```
 kubectl create -f finalmanifest.yaml
 ```
@@ -29,8 +47,7 @@ Status Running, READY 1/1 i 0 restartów wskazują na poprawną pracę Pod-a rem
 # Weryfikacja działania
 ## dostęp do domowej strony internetowej Pod-a remoteweb
 ```
-emilia@wojcik:~/lab7$ kubectl exec -it testpod -- sh
-/ # wget --spider --timeout=1 http://remoteweb.remote.svc.cluster.local
+emilia@wojcik:~/lab7$ kubectl exec -it testpod -- wget --spider --timeout=1 http://remoteweb.remote.svc.cluster.local
 Connecting to remoteweb.remote.svc.cluster.local (10.101.114.37:80)
 remote file exists
 ```
