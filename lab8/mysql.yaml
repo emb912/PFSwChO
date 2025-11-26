@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: my-sql
+    run: my-sql
+  name: my-sql
+spec:
+  containers:
+  - env:
+    - name: MYSQL_ROOT_PASSWORD
+      value: root
+    image: mysql
+    name: my-sql
+    resources: {}
+  nodeSelector:
+    node-role: "C"
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
