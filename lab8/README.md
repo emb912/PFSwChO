@@ -34,7 +34,7 @@ Gotowy manifest został załączony w plikach.
 ```
 kubectl run my-sql --image=mysql --env=MYSQL_ROOT_PASSWORD=root --dry-run=client -o yaml > mysql.yaml
 ```
-Tworząc pod nie podałam portu, bo domylnie będzie to 3306. Utworzony w ten sposób manifest zmodyfikowałam dodając do sekcji `spec` wartość `nodeSelector` `node-role: "C"`, aby umieścić utworzony Pod na węźle C. Oprócz tego dodałam etykietę app=my-sql, aby później ruch był poprawnie zarządzany przez NetworkPolicy.
+Tworząc pod nie podałam portu, bo domyślnie będzie to 3306. Utworzony w ten sposób manifest zmodyfikowałam dodając do sekcji `spec` wartość `nodeSelector` `node-role: "C"`, aby umieścić utworzony Pod na węźle C. Oprócz tego dodałam etykietę `app=my-sql`, aby później ruch był poprawnie zarządzany przez NetworkPolicy.
 Gotowy manifest został załączony w plikach.
 
 W celu utworzenia powyższych zasobów należy wykonać polecenia `kubectl create -f frontend.yaml`, `kubectl create -f backend.yaml`, `kubectl create -f mysql.yaml`.
@@ -62,7 +62,8 @@ frontend-svc   NodePort    10.102.28.192   <none>        80:31779/TCP   9m26s
 
 # 4. Tworzenie obiektów Service typu ClusterIP dla Deployment-u backend i Pod-a my-sql
 ## Deployment backend
-```kubectl expose deploy backend --type=ClusterIP --port=80 --target-port=80 --name=backend-svc
+```
+kubectl expose deploy backend --type=ClusterIP --port=80 --target-port=80 --name=backend-svc
 ```
 Weryfikuję poprawność utworzenia serwisu:
 ```
@@ -121,7 +122,7 @@ spec:
       - protocol: TCP
         port: 3306		#tylko na port 3306
 ```
-W podSelector wskazuję, jaki pod będzie chroniony (taki, który ma etykietę app: my-sql). Polityka sieciowa ingress oznacza, że kontrolowany będzie tylko ruch przychodzący do my-sql. Następnie w regułach ingress wskazuję, że dopuszczony tylko ruch z Pod-ami z etykietą app: backend i n aport 3306.
+W podSelector wskazuję, jaki pod będzie chroniony (taki, który ma etykietę app: my-sql). Polityka sieciowa ingress oznacza, że kontrolowany będzie tylko ruch przychodzący do my-sql. Następnie w regułach ingress wskazuję, że dopuszczony tylko ruch z Pod-ów z etykietą app: backend i na port 3306.
 Poleceniem `kubectl create -f netpol.yaml` uruchamiam NetworkPolicy na podstawie manifestu.
 ```
 emilia@wojcik:~/lab8-zad$ kubectl get netpol
