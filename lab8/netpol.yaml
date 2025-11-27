@@ -6,7 +6,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app: my-sql   
+      run: my-sql   
   policyTypes:
   - Ingress
   ingress:
