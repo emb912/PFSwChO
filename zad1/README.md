@@ -328,7 +328,7 @@ kubectl autoscale deployment frontend -n frontend --min=3 --max=10 --cpu=25% --m
 ```
 Utworzenie poleceniem `kubectl create -f hpa-frontend.yaml`.
 Jeden Pod frontend ma requests.cpu = 100m, maks. 10 Pod-ów -> 1000m CPU, czyli dokładnie tyle, ile dopuszcza ResourceQuota. Zatem Scheduler zablokuje każdą próbę przekroczenia. Średnie zużycie ustawiłam na 25%, aby przy testach było lepiej widać działanie HPA. 
-Początkowo obiekt HPA nie prezentował bieżącego wykorzystania CPU (<unknown>), mimo działającego Metrics Server. Przyczyną był brak zdefiniowanego parametru resources.requests.cpu w Deployment-cie frontend, który jest wymagany do obliczania procentowego wykorzystania zasobów przez HPA. Po uzupełnieniu tej konfiguracji autoskaler rozpoczął poprawne monitorowanie obciążenia.
+Początkowo obiekt HPA nie prezentował bieżącego wykorzystania CPU (\<unknown\>), mimo działającego Metrics Server. Przyczyną był brak zdefiniowanego parametru resources.requests.cpu w Deployment-cie frontend, który jest wymagany do obliczania procentowego wykorzystania zasobów przez HPA. Po uzupełnieniu tej konfiguracji autoskaler rozpoczął poprawne monitorowanie obciążenia.
 
 ```
 emilia@wojcik:~$ kubectl get hpa -n frontend
