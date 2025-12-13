@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: frontend-limits
+  namespace: frontend
+spec:
+  limits:
+  - type: Container
+    defaultRequest:
+      cpu: 100m
+      memory: 140Mi
+    default:
+      cpu: 100m
+      memory: 140Mi
