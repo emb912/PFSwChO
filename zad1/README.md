@@ -338,7 +338,7 @@ frontend   Deployment/frontend   cpu: 0%/25%, memory: 7%/25%   3         10     
 HPA zostało utworzone poprawnie i monitoruje zużycie wskazanych zasobów.
 
 # G. Weryfikacja poprawności działania HPA
-Utworzyłam Pod-a, który będzie generował obciążenie:
+Do wygenerowania obciążenia zastosowałam oddzielny Pod testowy, którego jedynym zadaniem jest generowanie intensywnego ruchu HTTP do usługi frontend. Pod ten nie jest częścią właściwej aplikacji. Wybrałam obraz httpd, ponieważ zawiera on narzędzie ApacheBench (ab), które pozwala w prosty sposób generować duże ilości równoległych żądań HTTP bez konieczności instalowania dodatkowych narzędzi w kontenerze. Narzędzie ab wysyła 70 000 żądań HTTP (-n 70000) z równoległością 100 (-c 100). W rezultacie Pod-y frontend są zmuszone do obsługi dużej liczby jednoczesnych połączeń, co prowadzi do wzrostu wykorzystania CPU.
 ```
 emilia@wojcik:~/$ kubectl run load-generator -n frontend --image=httpd --restart=Never -- sh -c '
     while true; do
@@ -346,7 +346,7 @@ emilia@wojcik:~/$ kubectl run load-generator -n frontend --image=httpd --restart
     done
   '  
 ```
-W kolejnym oknie terminala wykonałam polecenie, które ma na celu monitorowanie zużycia zasobów. Obserwując powolne zmiany w przyroście zużywanych zasobów, dodawałam kolejne Pod-y load-generator
+W kolejnym oknie terminala wykonałam polecenie, które ma na celu monitorowanie zużycia zasobów:
 ```
 emilia@wojcik:~$ kubectl get hpa -n frontend -w
 NAME       REFERENCE             TARGETS                       MINPODS   MAXPODS   REPLICAS   AGE
@@ -360,7 +360,6 @@ frontend   Deployment/frontend   cpu: 26%/25%, memory: 5%/25%   3         10    
 frontend   Deployment/frontend   cpu: 26%/25%, memory: 5%/25%   3         10        4          6h2m
 frontend   Deployment/frontend   cpu: 26%/25%, memory: 5%/25%   3         10        4          6h3m
 frontend   Deployment/frontend   cpu: 26%/25%, memory: 5%/25%   3         10        4          6h4m
-
 ```
 W trzecim oknie monitoruję Pod-y działające w przestrzeni nazw frontend:
 ```
