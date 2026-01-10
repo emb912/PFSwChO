@@ -25,7 +25,6 @@ SECRET_KEY = 'django-insecure-kcz(p@r2k0m1^goi#k-^sg5btj**nz9k@+v*e5)r4ev)wn^l(m
 # SECURITY WARNING: don't run with debug turned on in production!
 
 DEBUG = os.getenv("DJANGO_DEBUG", "0") == "1"
-ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "brilliantapp.zad").split(",")
 
 
 # Application definition
@@ -102,16 +101,17 @@ REST_FRAMEWORK = {
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": os.getenv("DB_NAME", "brilliantdb"),
-        "USER": os.getenv("DB_USER", "brilliantuser"),
-        "PASSWORD": os.getenv("DB_PASSWORD", ""),
-        "HOST": os.getenv("DB_HOST", "mysql"),
-        "PORT": os.getenv("DB_PORT", "3306"),
-        "OPTIONS": {"charset": "utf8mb4"},
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('DB_NAME', 'brilliantnotes'),
+        'USER': os.environ.get('DB_USER', 'root'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        'HOST': os.environ.get('DB_HOST', 'mysql-service'),
+        'PORT': '3306',
     }
 }
+
+ALLOWED_HOSTS = ['brilliantapp.zad', 'localhost', '127.0.0.1', '*']
 
 
 
