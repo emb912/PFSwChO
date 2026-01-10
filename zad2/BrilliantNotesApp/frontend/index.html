@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brilliant Notes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+
+  <body class="bg-slate-50 text-slate-900">
+    <div class="min-h-screen">
+      <header
+        class="sticky top-0 bg-white/80 backdrop-blur border-b border-slate-200"
+      >
+        <div
+          class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between gap-3"
+        >
+          <div>
+            <h1 class="text-xl font-semibold">Brilliant Notes</h1>
+            <p id="subtitle" class="text-sm text-slate-500">
+              Twoje notatki w jednym miejscu
+            </p>
+          </div>
+
+          <!-- RIGHT HEADER AREA (dynamic) -->
+          <div id="headerRight" class="flex items-center gap-2"></div>
+        </div>
+      </header>
+
+      <main class="max-w-5xl mx-auto px-4 py-6">
+        <!-- MAIN CONTENT (dynamic) -->
+        <div id="mainContent"></div>
+
+        <!-- Toast -->
+        <div
+          id="toast"
+          class="hidden fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-sm px-4 py-2 rounded-xl shadow-lg"
+        ></div>
+      </main>
+    </div>
+
+    <script src="./api.js"></script>
+    <script src="./auth-ui.js"></script>
+    <script src="./notes-ui.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
