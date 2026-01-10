@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-kcz(p@r2k0m1^goi#k-^sg5btj**nz9k@+v*e5)r4ev)wn^l(m'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = []
+DEBUG = os.getenv("DJANGO_DEBUG", "0") == "1"
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "brilliantapp.zad").split(",")
 
 
 # Application definition
@@ -54,13 +54,19 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:5173",
-    "http://localhost:5173",
-]
+if DEBUG:
+    CORS_ALLOWED_ORIGINS = [
+        "http://127.0.0.1:5173",
+        "http://localhost:5173",
+    ]
+else:
+    CORS_ALLOWED_ORIGINS = [
+        "http://brilliantapp.zad",
+    ]
 
 
 ROOT_URLCONF = 'brilliantnotes.urls'
+CSRF_TRUSTED_ORIGINS = ["http://brilliantapp.zad"]
 
 TEMPLATES = [
     {
@@ -96,11 +102,17 @@ REST_FRAMEWORK = {
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": os.getenv("DB_NAME", "brilliantdb"),
+        "USER": os.getenv("DB_USER", "brilliantuser"),
+        "PASSWORD": os.getenv("DB_PASSWORD", ""),
+        "HOST": os.getenv("DB_HOST", "mysql"),
+        "PORT": os.getenv("DB_PORT", "3306"),
+        "OPTIONS": {"charset": "utf8mb4"},
     }
 }
+
 
 
 # Password validation
