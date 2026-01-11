@@ -284,7 +284,7 @@ System został wdrozony za pomocą następujących poleceń:
 
 ```
 ~/PFSwChO/zad2/BrilliantNotesApp$ docker build -t brilliant-backend:v1 ./backend
-~/PFSwChO/zad2/BrilliantNotesApp$ docker build -t brilliant-frontend:v1 .frontend
+~/PFSwChO/zad2/BrilliantNotesApp$ docker build -t brilliant-frontend:v1 ./frontend
 ~/PFSwChO/zad2/k8s$ kubectl apply -f mysql.yaml
 ~/PFSwChO/zad2/k8s$ kubectl apply -f backend.yaml
 ~/PFSwChO/zad2/k8s$ kubectl apply -f frontend.yaml
@@ -327,3 +327,164 @@ Dzięki temu aplikacja jest dostępna w przeglądarce pod wskazanym w poleceniu 
 ![Zrzut ekranu prezentujący działanie aplikacji](./img/1.png)
 
 # Część nieobowiązkowa
+
+## Zmiany w aplikacji
+
+W ramach aktualizacji zostało zmienione tło aplikacji, a także czcionka, którą wyswietlane są nagłówki. W związku z tym, zmianie uległ plik `frontend/index.html`, gdzie zostały umieszczone nowe style.
+
+## Zmiany w plikach konfiguracyjnych
+
+Aby aktualizacja przebiegła bez przerywania działania, Kubernetes musi wiedzieć, kiedy nowy kontener jest gotowy do przyjęcia ruchu. Do tego służą Readiness Probes.
+
+Zmianom uległy następujące manifesty:
+
+### k8s/frontend.yaml -> k8s_extra/frontend.yaml
+
+Zmieniona definicja Deploymentu
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 2  # Zwiększam do 2, żeby lepiej widzieć rolling update
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0  # Podczas aktualizacji żaden pod nie może być niedostępny
+      maxSurge: 1        # Może być 1 dodatkowy pod ponad limit podczas aktualizacji
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: brilliant-frontend:v1 # To zmieniam komendą na v2 później
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
+        # SONDY
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 2
+          periodSeconds: 5
+```
+
+Dodana została sekcja livenessProbe i readinessProbe oraz strategia aktualizacji.
+
+### k8s/backend.yaml -> k8s_extra/backend.yaml
+
+Zmieniona definicja Deploymentu
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: brilliant-backend:v1
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DB_HOST
+          value: "mysql-service"
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: mysql-config
+              key: mysql-database
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-user
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-password
+        # SONDY
+        livenessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        readinessProbe:
+          tcpSocket:
+            port: 8000            # Sprawdzenie dostępności portu aplikacji
+          initialDelaySeconds: 10 # Czas na start Django i połączenie z DB
+          periodSeconds: 5        # Częste sprawdzanie podczas aktualizacji
+          failureThreshold: 3     # Odporność na pojedyncze błędy
+```
+
+Tu także zostały dodane sondy. Backend potrzebuje więcej czasu na start i połączenie z bazą.
+
+Strategia RollingUpdate dla Deploymentów skonfigurowana została z parametrami:
+
+- maxUnavailable: 0: podczas aktualizacji liczba dostępnych podów nigdy nie spadnie poniżej zadeklarowanej wartości. Kubernetes nie usunie starego poda, dopóki nowy nie będzie w pełni gotowy.
+- maxSurge: 1: pozwala na tymczasowe utworzenie jednego dodatkowego poda ponad limit w celu przeprowadzenia migracji.
+
+Zastosowano ponadto dwa rodzaje sond dla serwisów Frontend i Backend:
+
+- Liveness Probe: monitoruje, czy kontener żyje. Typ: httpGet (dla Frontendu jest to optymalne dla serwera Nginx, ponieważ odpowiedź HTTP 200 potwierdza, że serwer WWW działa i serwuje pliki) oraz tcpSocket (dla Backendu, ponieważ najszybciej potwierdza on otwarcie gniazda nasłuchującego, co jest sygnałem gotowości do procesowania żądań API.).
+- Readiness Probe: istotny element dla Rolling Update, ma za zadanie sprawdzać, czy aplikacja jest gotowa do obsługi ruchu sieciowego. Dopiero gdy readinessProbe zwróci sukces (status 200 OK lub udane połączenie TCP), Kubernetes uzna nowy pod za "Ready" i zacznie kierować do niego ruch z Ingressa/Serwisu. Zapobiega to wyświetlaniu błędów użytkownikom w momencie startu aplikacji (np. gdy Django jeszcze nawiązuje połączenie z bazą danych).
+
+## Ilustracja aktualizacji
+
+Zastosowanie nowych manifestów:
+
+```
+~/PFSwChO/zad2/k8s_extra$ kubectl apply -f backend.yaml
+~/PFSwChO/zad2/k8s_extra$ kubectl apply -f frontend.yaml
+```
+
+Zbudowanie nowej wersji obrazu frontendu:
+
+```
+~/PFSwChO/zad2/BrilliantNotesApp$ docker build -t brilliant-frontend:v2 ./frontend
+```
+
+Uruchomienie Rolling Update - aktualizacja obrazu w działającym Deploymencie:
+
+```
+kubectl set image deployment/frontend frontend=brilliant-frontend:v2
+```
+
+Obserwacja aktualizacji:
+
+```
+emilia@wojcik:~/PFSwChO/zad2/BrilliantNotesApp$ kubectl rollout status deployment/frontend
+Waiting for deployment "frontend" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "frontend" rollout to finish: 1 old replicas are pending termination...
+deployment "frontend" successfully rolled out
+```
+
+Dzięki przeprowadzonej aktualizacji, wygląd aplikacji uległ zmianie.
+![Zrzut ekranu prezentujący zaktualizowaną aplikację](./img/2.png)

@@ -3,12 +3,12 @@ kind: Deployment
 metadata:
   name: frontend
 spec:
-  replicas: 2  # Zwiększam do 2, żeby lepiej widzieć rolling update!
+  replicas: 2  # Zwiększam do 2, żeby lepiej widzieć rolling update
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxUnavailable: 0  # Podczas aktualizacji żaden pod nie może być niedostępny
-      maxSurge: 1        # Możey być 1 dodatkowy pod ponad limit podczas aktualizacji
+      maxSurge: 1        # Może być 1 dodatkowy pod ponad limit podczas aktualizacji
   selector:
     matchLabels:
       app: frontend
