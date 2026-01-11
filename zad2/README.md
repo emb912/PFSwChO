@@ -40,7 +40,7 @@ COPY . .
 
 EXPOSE 8000
 
-# Uruchomienie migracji i serwera przy starcie, przy każdym uruchomieniu kontenera automatycznie aplikowane są migracje # schematu bazy danych przed startem serwera aplikacji.
+# Uruchomienie migracji i serwera przy starcie
 CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
 ```
 
@@ -320,10 +320,10 @@ replicaset.apps/mysql-6bf46d6594      1         1         1       2m43s
 Aby adres http://brilliantapp.zad działał na komputerze, należy dodać IP Minikube do pliku /etc/hosts.
 
 ```
-$(minikube ip) brilliantapp.zad
+{wynik polecenia minikube ip} brilliantapp.zad
 ```
 
 Dzięki temu aplikacja jest dostępna w przeglądarce pod wskazanym w poleceniu adresem.
-(/img/1.png)
+![Zrzut ekranu prezentujący działanie aplikacji](./img/1.png)
 
 # Część nieobowiązkowa
