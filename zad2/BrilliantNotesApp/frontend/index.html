@@ -5,7 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Brilliant Notes</title>
     <script src="https://cdn.tailwindcss.com"></script>
-  </head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat&family=Grey+Qo&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">    
+    <style>
+        body {
+            /* Magiczny gradient w tle */
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #e94560; /* Kontrastowy kolor tekstu */
+            font-family: 'Lato', sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif; /* Nagłówki w magicznym stylu */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            color: #fff;
+        }
+
+        /* Lekka modyfikacja kontenerów, żeby pasowały do ciemnego tła */
+        #auth-container, #app-container {
+            background-color: rgba(255, 255, 255, 0.1); /* Półprzezroczyste tło */
+            backdrop-filter: blur(10px); /* Efekt szkła */
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            max-width: 600px;
+            margin: 0 auto;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        button {
+            background-color: #e94560;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Playfair Display', serif;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            background-color: #ff2e63;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+    </style>
+</head>
 
   <body class="bg-slate-50 text-slate-900">
     <div class="min-h-screen">
