@@ -77,7 +77,6 @@ function renderNotesShell() {
         <input id="pinnedOnly" type="checkbox" class="rounded border-slate-300" />
         Pokaż tylko przypięte
       </label>
-      <button id="refreshBtn" class="text-sm text-slate-600 hover:text-slate-900">Odśwież</button>
     </div>
 
     <div id="notesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
