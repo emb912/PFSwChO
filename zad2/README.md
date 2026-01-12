@@ -317,10 +317,14 @@ replicaset.apps/frontend-847f87b565   1         1         1       2m28s
 replicaset.apps/mysql-6bf46d6594      1         1         1       2m43s
 ```
 
-Aby adres http://brilliantapp.zad działał na komputerze, należy dodać IP Minikube do pliku /etc/hosts.
+Aby adres http://brilliantapp.zad działał na komputerze, należy dodać do pliku /etc/hosts wpis:
 
 ```
-{wynik polecenia minikube ip} brilliantapp.zad
+127.0.0.1 brilliantapp.zad
+```
+A także uruchomić proces przekierowania ruchu z portu 80 hosta na port 80 serwisu Ingress Controller. Dzięki temu zabiegowi aplikacja jest dostępna lokalnie pod stałym adresem.
+```
+sudo kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 80:80
 ```
 
 Dzięki temu aplikacja jest dostępna w przeglądarce pod wskazanym w poleceniu adresem.
